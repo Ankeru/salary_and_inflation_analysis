@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
+import matplotlib as mpl
 
 st.title('Анализ динамики уровня средних зарплат в России в разрезе по видам экономической деятельности на промежутке с 2000 до 2023 года')
 # Чтение фреймов зарплат
@@ -25,33 +25,32 @@ df.columns = ['Вид деятельности']+[x for x in range(2000, 2024)]
 - строительство.
 """
 
-def plt_settings(x, text):
-    plt.xticks(np.arange(min(x), max(x)+1, 1.0))
-    plt.xticks(rotation=90)
-    plt.grid(True)
-    plt.legend()
-    plt.xlabel('Годы') #Подпись для оси х
-    plt.ylabel('Среднемесячная З/П в рублях') #Подпись для оси y
-    plt.title(text) #Название
-    plt.show()
+def pyplot_settings(x, text):
+    mpl.pyplot.xticks(np.arange(min(x), max(x)+1, 1.0))
+    mpl.pyplot.xticks(rotation=90)
+    mpl.pyplot.grid(True)
+    mpl.pyplot.legend()
+    mpl.pyplot.xlabel('Годы') #Подпись для оси х
+    mpl.pyplot.ylabel('Среднемесячная З/П в рублях') #Подпись для оси y
+    mpl.pyplot.title(text) #Название
+    mpl.pyplot.show()
 
 # Графики
-plt.figure(figsize=(18,9))
+mpl.pyplot.figure(figsize=(18,9))
 labels = ('образование', 'добыча полезных ископаемых', 'строительство')
 colors = ('blue', 'brown', 'black')
 #Список годов 2000 - 2023
 x = df.columns[1:]
 for i in range(3):
     y = df.loc[df['Вид деятельности'] == labels[i]].iloc[0][1:]
-    plt.plot(x, y, color=colors[i], label=labels[i])
+    mpl.pyplot.plot(x, y, color=colors[i], label=labels[i])
     # Анализ на отрицательные изменения
     for j in range(1, len(x)-1):
         if y.iloc[j] < y.iloc[j-1]:
             st.text(f'Отрицательное изменение: вид деятельности – "{labels[i]}", в {x[j]} году.')
 
-plt_settings(x, 'График изменения среднемесячной номинальной начисленной заработной платы работников\nорганизаций в сферах образования, добычи полезных ископаемых и\
-    строительства')
-st.pyplot(plt)
+pyplot_settings(x, 'График изменения среднемесячной номинальной начисленной заработной платы работников\nорганизаций в сферах образования, добычи полезных ископаемых и строительства')
+st.pyplot(mpl.pyplot)
 
 """Выводы:
 - изменение всех среднемесячных номинальных З/П имеет выраженную положительную тенденцию;
@@ -118,14 +117,14 @@ for i in range(base_year_col_position_in_dataframe - 1, -1, -1):
 df_infl_koefs = df_infl_koefs.T
 
 # Графики
-plt.figure(figsize=(18,9))
+mpl.pyplot.figure(figsize=(18,9))
 labels = ('образование', 'добыча полезных ископаемых', 'строительство')
 colors = ('blue', 'brown', 'black')
 #Список годов 2000 - 2023
 x = df.columns[1:]
 for i in range(3):
     y = df.loc[df['Вид деятельности'] == labels[i]].iloc[0][1:].mul(df_infl_koefs['koefs'])
-    plt.plot(x, y, color=colors[i], label=labels[i]+'\'')
+    mpl.pyplot.plot(x, y, color=colors[i], label=labels[i]+'\'')
     # negative_change_years = []
     # for j in range(1, len(y)-1):
     #     if y.iloc[j] < y.iloc[j-1]:
@@ -135,10 +134,10 @@ for i in range(3):
     # else:
     #     st.text(f'Отрицательное изменение реальной З/П не зафиксированно')
 
-plt_settings(x, f'График изменения среднемесячной начисленной заработной \
+pyplot_settings(x, f'График изменения среднемесячной начисленной заработной \
 платы работников организаций в сферах образования,\nдобычи полезных ископаемых и\
  строительства с поправкой на инфляцию (в рублях {base_year}-го года)')
-st.pyplot(plt)
+st.pyplot(mpl.pyplot)
 """Выводы:
 - учет инфляции позволяет получить более адекватное представление об изменении среднемесячной начисленной заработной платы работников: даже при увеличении среднемесячной номинальной заработной платы реальная величина может уменьшаться из-за инфляции;
 - как видно на графике, изменение базового года влечет пересчет значений среднемесячных заработных плат в рубли этого года, но не приводит к изменению вида графика;  
